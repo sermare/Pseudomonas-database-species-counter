@@ -1,0 +1,50 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Thu May 28 11:54:46 2020
+
+@author: sergiomares
+"""
+
+# import blastn/p file with sequences willing to obtain species 
+
+import pandas as pd
+
+data = pd.read_csv("blastn.csv")
+
+data.dropna(inplace = True) 
+
+new = data['Replicon Name (Subject)'].str.split(" ",n=2,expand = True)
+
+data["Genus"]=new[0]
+
+data['Species']=new[1]
+
+data['Strain']=new[2]
+
+data.drop(columns=['Replicon Name (Subject)'],inplace = True)
+
+rows = zip(data['Genus'],data['Species'])
+
+def to_frequency_table(rows):
+    
+    frequencytable = {}
+    
+    for key in rows:
+        if key in frequencytable:
+            frequencytable[key] += 1
+        else:
+            frequencytable[key] = 1
+    return frequencytable
+
+df = to_frequency_table(rows)
+    
+with open('output-species.csv','w', newline='') as csv_file:
+        for key in df.keys():
+            csv_file.write("%s,%s\n"%(key,df[key]))  
+            
+        print('File output success')
+            
+# output file contains all genus and species found. 
+            
+
